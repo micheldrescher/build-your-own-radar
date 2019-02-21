@@ -1,107 +1,29 @@
-[![Build Status](https://travis-ci.org/thoughtworks/build-your-own-radar.svg?branch=master)](https://travis-ci.org/thoughtworks/build-your-own-radar)
-[![Stars](https://badgen.net/github/stars/thoughtworks/build-your-own-radar)](https://github.com/thoughtworks/build-your-own-radar)
-[![dependencies Status](https://david-dm.org/thoughtworks/build-your-own-radar/status.svg)](https://david-dm.org/thoughtworks/build-your-own-radar)
-[![devDependencies Status](https://david-dm.org/thoughtworks/build-your-own-radar/dev-status.svg)](https://david-dm.org/thoughtworks/build-your-own-radar?type=dev)
-[![peerDependencies Status](https://david-dm.org/thoughtworks/build-your-own-radar/peer-status.svg)](https://david-dm.org/thoughtworks/build-your-own-radar?type=peer)
-[![Docker Hub Pulls](https://img.shields.io/docker/pulls/wwwthoughtworks/build-your-own-radar.svg)](https://hub.docker.com/r/wwwthoughtworks/build-your-own-radar)
-[![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
-[![AGPL License](https://badgen.net/github/license/thoughtworks/build-your-own-radar)](https://github.com/thoughtworks/build-your-own-radar)
+A forked and adapted version of the original Thoughtworks(R) [Technology Radar](http://thoughtworks.com/radar).
 
+## Original code
 
-A library that generates an interactive radar, inspired by [thoughtworks.com/radar](http://thoughtworks.com/radar).
+Original code and instructions are available in [ThoughtWorks' github repo](https://github.com/thoughtworks/build-your-own-radar).
 
-## Demo
+## Project information
 
-You can see this in action at https://radar.thoughtworks.com. If you plug in [this data](https://docs.google.com/spreadsheets/d/1YXkrgV7Y6zShiPeyw4Y5_19QOfu5I6CyH5sGnbkEyiI/) you'll see [this visualization](https://radar.thoughtworks.com/?sheetId=1YXkrgV7Y6zShiPeyw4Y5_19QOfu5I6CyH5sGnbkEyiI). 
+This fork was created and adapted for the EC funded [Cyberwathcing project](https://www.cyberwatching.eu/) (grant agreement no. 740129)
 
-## How To Use
+## Changes compared to origianl version
 
-The easiest way to use the app out of the box is to provide a *public* Google Sheet ID from which all the data will be fetched. You can enter that ID into the input field on the first page of the application, and your radar will be generated. The data must conform to the format below for the radar to be generated correctly.
+### Added features
+Over time this list will be updated with managed branch merges.
 
-### Setting up your data
+#### Fixed blip ids
+The original assigns numbers to the blips per quadrant, since blips in that use case are typically identified by their name.
+EC projects however from time to time have very similar or even identical acronyms, which makes identifying them only by that very difficult. 
+Also, since the data is used elsewhere, cross-referencing by id is far easier.
 
-You need to make your data public in a form we can digest.
+This is solved by adding a new first column in the Google spreadsheet which carries the project id (a unique number) that is added to the blip object in the code, substituting for the setNumbers() function in Object Radar.
 
-Create a Google Sheet. Give it at least the below column headers, and put in the content that you want:
+### Removed features
 
-| name          | ring   | quadrant               | isNew | description                                             |
-|---------------|--------|------------------------|-------|---------------------------------------------------------|
-| Composer      | adopt  | tools                  | TRUE  | Although the idea of dependency management ...          |
-| Canary builds | trial  | techniques             | FALSE | Many projects have external code dependencies ...       |
-| Apache Kylin  | assess | platforms              | TRUE  | Apache Kylin is an open source analytics solution ...   |
-| JSF           | hold   | languages & frameworks | FALSE | We continue to see teams run into trouble using JSF ... |
+#### No Google auth
+Our data is not confidential, and write access to the Google sheet(s) is tightly controlled.
 
-### Sharing the sheet
-
-* In Google sheets, go to 'File', choose 'Publish to the web...' and then click 'Publish'.
-* Close the 'Publish to the web' dialog.
-* Copy the URL of your editable sheet from the browser (Don't worry, this does not share the editable version). 
-
-The URL will be similar to [https://docs.google.com/spreadsheets/d/1waDG0_W3-yNiAaUfxcZhTKvl7AUCgXwQw8mdPjCz86U/edit](https://docs.google.com/spreadsheets/d/1waDG0_W3-yNiAaUfxcZhTKvl7AUCgXwQw8mdPjCz86U/edit). In theory we are only interested in the part between '/d/' and '/edit' but you can use the whole URL if you want.
-
-### Using CSV data
-The other way to provide your data is using CSV document format.
-You can enter any URL that responds CSV data into the input field on the first page.
-The format is just the same as that of the Google Sheet, the example is as follows:
-
-```
-name,ring,quadrant,isNew,description  
-Composer,adopt,tools,TRUE,"Although the idea of dependency management ..."  
-Canary builds,trial,techniques,FALSE,"Many projects have external code dependencies ..."  
-Apache Kylin,assess,platforms,TRUE,"Apache Kylin is an open source analytics solution ..."  
-JSF,hold,languages & frameworks,FALSE,"We continue to see teams run into trouble using JSF ..."  
-```
-
-Note: The CSV file parsing is using D3 library, so consult the D3 documentation for the data format details.
-
-### Building the radar
-
-Paste the URL in the input field on the home page.
-
-That's it!
-
-Note: the quadrants of the radar, and the order of the rings inside the radar will be drawn in the order they appear in your data.
-
-### More complex usage
-
-To create the data representation, you can use the Google Sheet [factory](/src/util/factory.js) or CSV, or you can also insert all your data straight into the code.
-
-The app uses [Tabletop.js](https://github.com/jsoma/tabletop) to fetch the data from a Google Sheet or [D3.js](https://d3js.org/) if supplied as CSV, so refer to their documentation for more advanced interaction.  The input data is sanitized by whitelisting HTML tags with [sanitize-html](https://github.com/punkave/sanitize-html).
-
-The application uses [webpack](https://webpack.github.io/) to package dependencies and minify all .js and .scss files.
-
-## Docker Image
-We have released BYOR as a docker image for our users. The image is available in our [DockerHub Repo](https://hub.docker.com/r/wwwthoughtworks/build-your-own-radar/). To pull and run the image, run the following commands.
-
-```
-$ docker pull wwwthoughtworks/build-your-own-radar
-$ docker run --rm -p 8080:80 -e SERVER_NAMES="localhost 127.0.0.1" wwwthoughtworks/build-your-own-radar
-$ open http://localhost:8080
-```
-
-## Contribute
-
-All tasks are defined in `package.json`.
-
-Pull requests are welcome; please write tests whenever possible. 
-Make sure you have nodejs installed.
-
-- `git clone git@github.com:thoughtworks/build-your-own-radar.git`
-- `npm install`
-- `npm test` - to run your tests
-- `npm run dev` - to run application in localhost:8080. This will watch the .js and .css files and rebuild on file changes
-
-To run End to End tests in headless mode
-- add a new environment variable 'TEST_URL' and set it to 'http://localhost:8080/'
-- `npm run end_to_end_test`
-
-To run End to End tests in debug mode
-- add a new environment variable 'TEST_URL' and set it to 'http://localhost:8080/'
-- `npm run start`
-- Click on 'Run all specs' in cypress window
-
-### Don't want to install node? Run with one line docker
-
-     $ docker run -p 8080:8080 -v $PWD:/app -w /app -it node:10.14.2 /bin/sh -c 'npm install && npm run dev'
-
-After building it will start on localhost:8080
+#### No CSV input
+Our integration points are Google sheets, which allow for easier collaborative access. Data to be included in the sheets are processed and generated automatically, and write access in general is needed only for adding a new sheet and copying and pasting the data into it.
