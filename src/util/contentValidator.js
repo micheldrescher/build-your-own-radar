@@ -5,6 +5,8 @@ const _ = {
   each: require('lodash/each')
 }
 
+const util = require('util')
+const GLOBS = require('../models/globals')
 const MalformedDataError = require('../../src/exceptions/malformedDataError')
 const ExceptionMessages = require('./exceptionMessages')
 
@@ -21,7 +23,7 @@ const ContentValidator = function (columnNames) {
   }
 
   self.verifyHeaders = function () {
-    _.each(['name', 'ring', 'quadrant', 'isNew', 'description'], function (field) {
+    _.each(GLOBS.COLUMN_NAMES, function (field) {
       if (columnNames.indexOf(field) === -1) {
         throw new MalformedDataError(ExceptionMessages.MISSING_HEADERS)
       }

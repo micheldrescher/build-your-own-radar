@@ -22,7 +22,7 @@ const SheetNotFoundError = require('../exceptions/sheetNotFoundError')
 const ContentValidator = require('./contentValidator')
 const Sheet = require('./sheet')
 const ExceptionMessages = require('./exceptionMessages')
-const GoogleAuth = require('./googleAuth')
+const GLOBS = require('../models/globals')
 
 const plotRadar = function (title, blips, currentRadarName, alternativeRadars) {
   document.title = title
@@ -32,6 +32,7 @@ const plotRadar = function (title, blips, currentRadarName, alternativeRadars) {
   var ringMap = {}
   var maxRings = 4
 
+  // validate ring names
   _.each(rings, function (ringName, i) {
     if (i === maxRings) {
       throw new MalformedDataError(ExceptionMessages.TOO_MANY_RINGS)
@@ -44,7 +45,7 @@ const plotRadar = function (title, blips, currentRadarName, alternativeRadars) {
     if (!quadrants[blip.quadrant]) {
       quadrants[blip.quadrant] = new Quadrant(_.capitalize(blip.quadrant))
     }
-    quadrants[blip.quadrant].add(new Blip(blip.name, ringMap[blip.ring], blip.isNew.toLowerCase() === 'true', blip.topic, blip.description))
+    quadrants[blip.quadrant].add(new Blip(blip.id, blip.name, ringMap[blip.ring], blip.isNew.toLowerCase() === 'true', blip.topic, blip.description))
   })
 
   var radar = new Radar()

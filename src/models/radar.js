@@ -49,7 +49,6 @@ const Radar = function () {
       throw new MalformedDataError(ExceptionMessages.TOO_MANY_QUADRANTS)
     }
     quadrants[addingQuadrant].quadrant = quadrant
-    setNumbers(quadrant.blips())
     addingQuadrant++
   }
 
