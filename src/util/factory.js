@@ -120,39 +120,6 @@ const GoogleSheet = function (sheetReference, sheetName) {
     }
   }
 
-  // same as above - but not used?
-  function createBlipsForProtectedSheet (documentTitle, values, sheetNames) {
-    if (!sheetName) {
-      sheetName = sheetNames[0]
-    }
-    values.forEach(function (value) {
-      var contentValidator = new ContentValidator(values[0])
-      contentValidator.verifyContent()
-      contentValidator.verifyHeaders()
-    })
-
-    const all = values
-    const header = all.shift()
-    var blips = _.map(all, blip => new InputSanitizer().sanitizeForProtectedSheet(blip, header))
-    plotRadar(documentTitle + ' - ' + sheetName, blips, sheetName, sheetNames)
-  }
-
-  self.authenticate = function (force = false, callback) {
-    GoogleAuth.loadGoogle(function (e) {
-      GoogleAuth.login(_ => {
-        var sheet = new Sheet(sheetReference)
-        sheet.processSheetResponse(sheetName, createBlipsForProtectedSheet, error => {
-          if (error.status === 403) {
-            plotUnauthorizedErrorMessage()
-          } else {
-            plotErrorMessage(error)
-          }
-        })
-        if (callback) { callback() }
-      }, force)
-    })
-  }
-
   self.init = function () {
     plotLoading()
     return self
@@ -165,16 +132,6 @@ const DomainName = function (url) {
   var search = /.+:\/\/([^\\/]+)/
   var match = search.exec(decodeURIComponent(url.replace(/\+/g, ' ')))
   return match == null ? null : match[1]
-}
-
-const FileName = function (url) {
-  var search = /([^\\/]+)$/
-  var match = search.exec(decodeURIComponent(url.replace(/\+/g, ' ')))
-  if (match != null) {
-    var str = match[1]
-    return str
-  }
-  return url
 }
 
 /************************************************
@@ -350,52 +307,6 @@ function plotErrorMessage (exception) {
     .html(homePage)
 
   plotFooter(content)
-}
-
-function plotUnauthorizedErrorMessage () {
-  var content = d3.select('body')
-    .append('div')
-    .attr('class', 'input-sheet')
-  setDocumentTitle()
-
-  plotLogo(content)
-
-  var bannerText = '<div><h1>Build your own radar</h1></div>'
-
-  plotBanner(content, bannerText)
-
-  d3.selectAll('.loading').remove()
-  const currentUser = GoogleAuth.geEmail()
-  let homePageURL = window.location.protocol + '//' + window.location.hostname
-  homePageURL += (window.location.port === '' ? '' : ':' + window.location.port)
-  const goBack = '<a href=' + homePageURL + '>GO BACK</a>'
-  const message = `<strong>Oops!</strong> Looks like you are accessing this sheet using <b>${currentUser}</b>, which does not have permission.Try switching to another account.`
-
-  const container = content.append('div').attr('class', 'error-container')
-
-  const errorContainer = container.append('div')
-    .attr('class', 'error-container__message')
-
-  errorContainer.append('div').append('p')
-    .attr('class', 'error-title')
-    .html(message)
-
-  const button = errorContainer.append('button')
-    .attr('class', 'button switch-account-button')
-    .text('SWITCH ACCOUNT')
-
-  errorContainer.append('div').append('p')
-    .attr('class', 'error-subtitle')
-    .html(`or ${goBack} to try a different sheet.`)
-
-  button.on('click', _ => {
-    var queryString = window.location.href.match(/sheetId(.*)/)
-    var queryParams = queryString ? QueryParams(queryString[0]) : {}
-    const sheet = GoogleSheet(queryParams.sheetId, queryParams.sheetName)
-    sheet.authenticate(true, _ => {
-      content.remove()
-    })
-  })
 }
 
 module.exports = GoogleSheetInput
