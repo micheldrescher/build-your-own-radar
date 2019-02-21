@@ -161,35 +161,6 @@ const GoogleSheet = function (sheetReference, sheetName) {
   return self
 }
 
-const CSVDocument = function (url) {
-  var self = {}
-
-  self.build = function () {
-    d3.csv(url, createBlips)
-  }
-
-  var createBlips = function (data) {
-    try {
-      var columnNames = data['columns']
-      delete data['columns']
-      var contentValidator = new ContentValidator(columnNames)
-      contentValidator.verifyContent()
-      contentValidator.verifyHeaders()
-      var blips = _.map(data, new InputSanitizer().sanitize)
-      plotRadar(FileName(url), blips, 'CSV File', [])
-    } catch (exception) {
-      plotErrorMessage(exception)
-    }
-  }
-
-  self.init = function () {
-    plotLoading()
-    return self
-  }
-
-  return self
-}
-
 const DomainName = function (url) {
   var search = /.+:\/\/([^\\/]+)/
   var match = search.exec(decodeURIComponent(url.replace(/\+/g, ' ')))
@@ -211,13 +182,11 @@ const FileName = function (url) {
  *     MAIN ENTRY POINT TO TECHNOLOGY RADAR     *
  *                                              *
  * This factory (GoogleSheetInput) does one of  *
- * three things:                                *
+ * two things:                                  *
  * 1. If location URL is 'empty', show form to  *
  *    user for providing a URL to a Google sheet*
  *    or a CSV data source                      *
- * 2. If the location URL points to a CSV, use  *
- *    the CSV as the data source.               *
- * 3. If the domain name of the data source URL *
+ * 2. If the domain name of the data source URL *
  *    includes 'google.com', presume it is a    *
  *    Google spreadsheet and load it using      *
  *    Tabletops                                 *
@@ -231,22 +200,17 @@ const GoogleSheetInput = function () {
   var sheet
 
   self.build = function () {
-    var domainName = DomainName(window.location.search.substring(1))
-    var queryString = window.location.href.match(/sheetId(.*)/)
     // parse the URL for Google sheetName
     // Examples:
     //    /d/1hWMiKGlrKmmm4cnWWPyuYPFfK_ndaQeyrgLEec6o_PI/edit#gid=813146703
     //    /d/1hWMiKGlrKmmm4cnWWPyuYPFfK_ndaQeyrgLEec6o_PI/edit#gid=0 (first or default)
+    var domainName = DomainName(window.location.search.substring(1))
+    var queryString = window.location.href.match(/sheetId(.*)/)
     var queryParams = queryString ? QueryParams(queryString[0]) : {}
-
-    // load a CSV - TODO remove
-    if (domainName && queryParams.sheetId.endsWith('csv')) {
-      sheet = CSVDocument(queryParams.sheetId)
-      sheet.init().build()
 
     // load the google sheet
     // TODO make this the default with a pre-configured list of sheets
-    } else if (domainName && domainName.endsWith('google.com') && queryParams.sheetId) {
+    if (domainName && domainName.endsWith('google.com') && queryParams.sheetId) {
       sheet = GoogleSheet(queryParams.sheetId, queryParams.sheetName)
       console.log(queryParams.sheetName)
       sheet.init().build()

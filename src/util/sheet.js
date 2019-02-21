@@ -3,6 +3,14 @@ const SheetNotFoundError = require('../../src/exceptions/sheetNotFoundError')
 const UnauthorizedError = require('../../src/exceptions/unauthorizedError')
 const ExceptionMessages = require('./exceptionMessages')
 
+/*****************************************************************************
+ *                                                                           *
+ *                            GOOGLE SHEET model                             *
+ *                                                                           *
+ * Models one specific sheet (with an id, as given in #gid=xxxxxxx) and its  *
+ * contents.                                                                 *
+ *                                                                           *
+ *****************************************************************************/
 const Sheet = function (sheetReference) {
   var self = {};
 
