@@ -66,10 +66,21 @@ const plotRadar = function (title, blips, currentRadarName, alternativeRadars) {
   new GraphingRadar(size, radar).init().plot()
 }
 
+/******************************************************************************
+ *                                                                            *
+ *                            GOOGLE SPREAD SHEET                             *
+ *                                                                            *
+ *         Model of a Google sheet and reading in of all of its data.         *
+ *                                                                            *
+ ******************************************************************************/
 const GoogleSheet = function (sheetReference, sheetName) {
   var self = {}
 
+  /** 
+   * Build an internal representation of the Google sheet for display
+   */
   self.build = function () {
+    // a single sheet in a Google spreadsheet
     var sheet = new Sheet(sheetReference)
     sheet.validate(function (error) {
       if (!error) {
@@ -87,6 +98,7 @@ const GoogleSheet = function (sheetReference, sheetName) {
       self.authenticate(false)
     })
 
+    // create radar blips - one for each data row
     function createBlips (__, tabletop) {
       try {
         if (!sheetName) {
@@ -108,6 +120,7 @@ const GoogleSheet = function (sheetReference, sheetName) {
     }
   }
 
+  // same as above - but not used?
   function createBlipsForProtectedSheet (documentTitle, values, sheetNames) {
     if (!sheetName) {
       sheetName = sheetNames[0]
@@ -193,6 +206,26 @@ const FileName = function (url) {
   return url
 }
 
+/************************************************
+ *                                              *
+ *     MAIN ENTRY POINT TO TECHNOLOGY RADAR     *
+ *                                              *
+ * This factory (GoogleSheetInput) does one of  *
+ * three things:                                *
+ * 1. If location URL is 'empty', show form to  *
+ *    user for providing a URL to a Google sheet*
+ *    or a CSV data source                      *
+ * 2. If the location URL points to a CSV, use  *
+ *    the CSV as the data source.               *
+ * 3. If the domain name of the data source URL *
+ *    includes 'google.com', presume it is a    *
+ *    Google spreadsheet and load it using      *
+ *    Tabletops                                 *
+ *                                              *
+ * Either way, if CSV or Googlesheet, an        *
+ * instance of Googlesheet it created and told  *
+ * to build itself on the pulled in data.       *
+*************************************************/
 const GoogleSheetInput = function () {
   var self = {}
   var sheet
@@ -200,16 +233,26 @@ const GoogleSheetInput = function () {
   self.build = function () {
     var domainName = DomainName(window.location.search.substring(1))
     var queryString = window.location.href.match(/sheetId(.*)/)
+    // parse the URL for Google sheetName
+    // Examples:
+    //    /d/1hWMiKGlrKmmm4cnWWPyuYPFfK_ndaQeyrgLEec6o_PI/edit#gid=813146703
+    //    /d/1hWMiKGlrKmmm4cnWWPyuYPFfK_ndaQeyrgLEec6o_PI/edit#gid=0 (first or default)
     var queryParams = queryString ? QueryParams(queryString[0]) : {}
 
+    // load a CSV - TODO remove
     if (domainName && queryParams.sheetId.endsWith('csv')) {
       sheet = CSVDocument(queryParams.sheetId)
       sheet.init().build()
+
+    // load the google sheet
+    // TODO make this the default with a pre-configured list of sheets
     } else if (domainName && domainName.endsWith('google.com') && queryParams.sheetId) {
       sheet = GoogleSheet(queryParams.sheetId, queryParams.sheetName)
       console.log(queryParams.sheetName)
-
       sheet.init().build()
+      
+    // Show the default form
+    // TODO remove as we don't need that, or beautify it into a radar overview
     } else {
       var content = d3.select('body')
         .append('div')

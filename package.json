@@ -1,7 +1,7 @@
 {
-  "name": "build-your-own-radar",
+  "name": "Cyberwatching Radar",
   "version": "0.3.0",
-  "description": "",
+  "description": "A Technology Radar based on ThoughtWorks' original Technology Radar.",
   "main": "index.js",
   "scripts": {
     "test": "standard && istanbul cover jasmine",
