@@ -1,5 +1,6 @@
 /* eslint no-constant-condition: "off" */
 
+const util = require('util')
 const d3 = require('d3')
 const Tabletop = require('tabletop')
 const _ = {
@@ -80,10 +81,12 @@ const GoogleSheet = function (sheetReference, sheetName) {
    * Build an internal representation of the Google sheet for display
    */
   self.build = function () {
-    // a single sheet in a Google spreadsheet
     var sheet = new Sheet(sheetReference)
     sheet.validate(function (error) {
       if (!error) {
+        // This provides access to all sheets in the given Google Spreadsheet document
+        // PRESUME - it's lazy loading, i.e. this is only the Google API layer and data
+        //           loading is done later in the actual sheet / Tabletop Model
         Tabletop.init({
           key: sheet.id,
           callback: createBlips
@@ -95,25 +98,37 @@ const GoogleSheet = function (sheetReference, sheetName) {
         plotErrorMessage(error)
         return
       }
-      self.authenticate(false)
     })
 
     // create radar blips - one for each data row
+    // invoked as a callback from build() via Tabletop tool
     function createBlips (__, tabletop) {
       try {
+        // If we have a sheet name, use that. Otherwise use the first found.
+        // This allows us to use a stack of sheets within the Google Spreadhseet of 
+        // historic tech radars.
+        // Function "plotRadar" called later takes care of offering a clickable list of 
+        // historic radars
         if (!sheetName) {
           sheetName = tabletop.foundSheetNames[0]
         }
         var columnNames = tabletop.sheets(sheetName).columnNames
 
+        // nice try...
         var contentValidator = new ContentValidator(columnNames)
-        contentValidator.verifyContent()
-        contentValidator.verifyHeaders()
+        contentValidator.verifyContent() // useless in the current version. Leaving it in for now...
+        contentValidator.verifyHeaders() // that's better!
 
+        // fetch all rows of the selected sheet - I hope this is the lazy pull, otherwise
+        // Tabletop is a resource waster!
         var all = tabletop.sheets(sheetName).all()
+
+        // create the blips off the pulled data
         var blips = _.map(all, new InputSanitizer().sanitize)
 
+        // ... aaaaand plot the resulting HTML page!
         plotRadar(tabletop.googleSheetName + ' - ' + sheetName, blips, sheetName, tabletop.foundSheetNames)
+
       } catch (exception) {
         plotErrorMessage(exception)
       }
@@ -159,17 +174,28 @@ const GoogleSheetInput = function () {
   self.build = function () {
     // parse the URL for Google sheetName
     // Examples:
-    //    /d/1hWMiKGlrKmmm4cnWWPyuYPFfK_ndaQeyrgLEec6o_PI/edit#gid=813146703
-    //    /d/1hWMiKGlrKmmm4cnWWPyuYPFfK_ndaQeyrgLEec6o_PI/edit#gid=0 (first or default)
-    var domainName = DomainName(window.location.search.substring(1))
-    var queryString = window.location.href.match(/sheetId(.*)/)
-    var queryParams = queryString ? QueryParams(queryString[0]) : {}
+    //    /d/1hWMiKGlrKmmm4cnWWPyuYPFfK_ndaQeyrgLEec6o_PI/edit (first or default)
+    //    /d/1hWMiKGlrKmmm4cnWWPyuYPFfK_ndaQeyrgLEec6o_PI/edit&sheetName=Sheet3 // a specific sheet
 
-    // load the google sheet
-    // TODO make this the default with a pre-configured list of sheets
+    // A domain name in the "sheetId" query paramenter (from the built-in form, see below)
+    var domainName = DomainName(window.location.search.substring(1))
+    
+    // Extract query parameters from the location URL. The following are used:
+    // sheetId - the id of the Google Spreadsheet document
+    // sheetName - the name of the sheet (not its id!) within the spreadsheet document
+    //             if undefined, the first is used
+    var queryString = window.location.href.match(/sheetId(.*)/)       // test if called via form
+    var queryParams = queryString ? QueryParams(queryString[0]) : {}  // sanitised verison of queryString
+
+    // some logging
+    console.log("domainName = " + domainName)
+    console.log("queryParams.sheetId = " + queryParams.sheetId)
+    console.log("queryParams.sheetName = " + queryParams.sheetName)
+
+    // got called as part of the default form
+    // ==> load the provided Google sheet
     if (domainName && domainName.endsWith('google.com') && queryParams.sheetId) {
       sheet = GoogleSheet(queryParams.sheetId, queryParams.sheetName)
-      console.log(queryParams.sheetName)
       sheet.init().build()
       
     // Show the default form

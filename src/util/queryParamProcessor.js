@@ -1,3 +1,5 @@
+const util = require('util')
+
 const QueryParams = function (queryString) {
   var decode = function (s) {
     return decodeURIComponent(s.replace(/\+/g, ' '))
