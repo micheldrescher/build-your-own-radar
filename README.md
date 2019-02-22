@@ -6,7 +6,7 @@ Original code and instructions are available in [ThoughtWorks' github repo](http
 
 ## Project information
 
-This fork was created and adapted for the EC funded [Cyberwathcing project](https://www.cyberwatching.eu/) (grant agreement no. 740129)
+This fork was created and adapted for the EC funded [Cyberwatching project](https://www.cyberwatching.eu/) (grant agreement no. 740129)
 
 ## Changes compared to origianl version
 
