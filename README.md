@@ -13,7 +13,7 @@ This fork was created and adapted for the EC funded [Cyberwathcing project](http
 ### Added features
 Over time this list will be updated with managed branch merges.
 
-#### Fixed blip ids
+#### 1. Fixed blip ids
 The original assigns numbers to the blips per quadrant, since blips in that use case are typically identified by their name.
 EC projects however from time to time have very similar or even identical acronyms, which makes identifying them only by that very difficult. 
 Also, since the data is used elsewhere, cross-referencing by id is far easier.
@@ -22,8 +22,8 @@ This is solved by adding a new first column in the Google spreadsheet which carr
 
 ### Removed features
 
-#### No Google auth
+#### 1. No Google auth
 Our data is not confidential, and write access to the Google sheet(s) is tightly controlled.
 
-#### No CSV input
+#### 2. No CSV input
 Our integration points are Google sheets, which allow for easier collaborative access. Data to be included in the sheets are processed and generated automatically, and write access in general is needed only for adding a new sheet and copying and pasting the data into it.
