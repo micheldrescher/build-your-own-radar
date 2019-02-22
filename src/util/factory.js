@@ -28,27 +28,41 @@ const plotRadar = function (title, blips, currentRadarName, alternativeRadars) {
   document.title = title
   d3.selectAll('.loading').remove()
 
-  var rings = _.map(_.uniqBy(blips, 'ring'), 'ring')
+  var sheetRings = _.map(_.uniqBy(blips, 'ring'), 'ring')
   var ringMap = {}
-  var maxRings = 4
+  var rings = []
 
-  // validate ring names
-  _.each(rings, function (ringName, i) {
-    if (i === maxRings) {
-      throw new MalformedDataError(ExceptionMessages.TOO_MANY_RINGS)
-    }
-    ringMap[ringName] = new Ring(ringName, i)
+  // check too many rings defined
+  if (sheetRings.length > GLOBS.RING_NAMES.length) {
+    throw new MalformedDataError(ExceptionMessages.TOO_MANY_RINGS)
+  }
+
+  // create static Ring map as per global definition
+  _.each(GLOBS.RING_NAMES, function (ringName, i) {
+    var r = new Ring(ringName, i)
+    ringMap[ringName] = r
+    rings.push(r)
   })
 
   var quadrants = {}
+  var numIgnored = 0;
   _.each(blips, function (blip) {
-    if (!quadrants[blip.quadrant]) {
-      quadrants[blip.quadrant] = new Quadrant(_.capitalize(blip.quadrant))
+    // regard only those blips with valid ring names
+    if (!ringMap[blip.ring]) {
+      numIgnored++
+      console.log("Ignoring blip " + blip.id + " - " + blip.name)
+    } else {
+      if (!quadrants[blip.quadrant]) {
+        quadrants[blip.quadrant] = new Quadrant(_.capitalize(blip.quadrant))
+      }
+      quadrants[blip.quadrant].add(new Blip(blip.id, blip.name, ringMap[blip.ring], blip.isNew.toLowerCase() === 'true', blip.topic, blip.description))
     }
-    quadrants[blip.quadrant].add(new Blip(blip.id, blip.name, ringMap[blip.ring], blip.isNew.toLowerCase() === 'true', blip.topic, blip.description))
   })
+  if (numIgnored > 0) {
+    console.log("Ignored a total of " + numIgnored + " entries")
+  }
 
-  var radar = new Radar()
+  var radar = new Radar(rings)
   _.each(quadrants, function (quadrant) {
     radar.addQuadrant(quadrant)
   })

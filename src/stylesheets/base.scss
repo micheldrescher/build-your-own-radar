@@ -178,6 +178,11 @@ body {
       }
 
       path {
+        &.ring-arc-4 {
+          stroke: none;
+          fill: $grey-lightest;
+        }
+
         &.ring-arc-3 {
           stroke: none;
           fill: $grey-light;

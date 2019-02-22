@@ -1,5 +1,7 @@
 const MalformedDataError = require('../exceptions/malformedDataError')
 const ExceptionMessages = require('../util/exceptionMessages')
+const util = require('util')
+const GLOBS = require('../models/globals')
 
 const _ = {
   map: require('lodash/map'),
@@ -7,10 +9,9 @@ const _ = {
   sortBy: require('lodash/sortBy')
 }
 
-const Radar = function () {
-  var self, quadrants, blipNumber, addingQuadrant, alternatives, currentSheetName
+const Radar = function (staticRings) {
+  var self, quadrants, addingQuadrant, alternatives, currentSheetName
 
-  blipNumber = 0
   addingQuadrant = 0
   quadrants = [
     { order: 'first', startAngle: 90 },
@@ -21,12 +22,6 @@ const Radar = function () {
   alternatives = []
   currentSheetName = ''
   self = {}
-
-  function setNumbers (blips) {
-    blips.forEach(function (blip) {
-      blip.setNumber(++blipNumber)
-    })
-  }
 
   self.addAlternative = function (sheetName) {
     alternatives.push(sheetName)
@@ -64,14 +59,9 @@ const Radar = function () {
     }, [])
   }
 
+  // returns a static array of Ring instances
   self.rings = function () {
-    return _.sortBy(_.map(_.uniqBy(allBlips(), function (blip) {
-      return blip.ring().name()
-    }), function (blip) {
-      return blip.ring()
-    }), function (ring) {
-      return ring.order()
-    })
+    return staticRings
   }
 
   self.quadrants = function () {

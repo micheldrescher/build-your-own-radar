@@ -5,6 +5,7 @@ const Definitions = {
 
     // static names of the radar rings - must be in order innermost to outermost!
     RING_NAMES: ['Adopt', 'Trial', 'Assess', 'Hold', 'Drop']
+
 }
 
 module.exports = Definitions

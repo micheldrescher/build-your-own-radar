@@ -1,5 +1,5 @@
 {
-  "name": "Cyberwatching Radar",
+  "name": "cyberwatching-radar",
   "version": "0.3.0",
   "description": "A Technology Radar based on ThoughtWorks' original Technology Radar.",
   "main": "index.js",

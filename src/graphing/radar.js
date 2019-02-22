@@ -4,6 +4,7 @@ const Chance = require('chance')
 const _ = require('lodash/core')
 const $ = require('jquery')
 require('jquery-ui/ui/widgets/autocomplete')
+const util = require('util')
 
 const RingCalculator = require('../util/ringCalculator')
 const QueryParams = require('../util/queryParamProcessor')

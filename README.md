@@ -20,6 +20,13 @@ Also, since the data is used elsewhere, cross-referencing by id is far easier.
 
 This is solved by adding a new first column in the Google spreadsheet which carries the project id (a unique number) that is added to the blip object in the code, substituting for the setNumbers() function in Object Radar.
 
+#### 2. Fixed rings
+For our radar, we are using fixed ring names, independent of what's provided in the Google sheet, and all rings are always displayed in the given order, irrespective of their first appearances in the Google spreadsheet. (This helps with machine generated/calculated radar contents.)
+
+Empty rings are plotted as well - as opposed to the original - to reach consistency across editions of our radars. 
+
+Rings specified in the source data but not part of our fixed ring set are ignored. Blips located on invalid rings are filtered out, and logged on the console.
+
 ### Removed features
 
 #### 1. No Google auth
