@@ -1,5 +1,5 @@
 const RingCalculator = function (numberOfRings, maxRadius) {
-  var sequence = [0, 6, 5, 4, 3, 2, 1, 1]
+  var sequence = [0, 12, 8, 6, 4, 2]
 
   var self = {}
 
