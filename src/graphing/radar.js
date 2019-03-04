@@ -5,6 +5,7 @@ const _ = require('lodash/core')
 const $ = require('jquery')
 require('jquery-ui/ui/widgets/autocomplete')
 const util = require('util')
+const GLOBS = require('../models/globals')
 
 const RingCalculator = require('../util/ringCalculator')
 const QueryParams = require('../util/queryParamProcessor')
@@ -38,6 +39,10 @@ const Radar = function (size, radar) {
 
   function toRadian (angleInDegrees) {
     return Math.PI * angleInDegrees / 180
+  }
+
+  function toDegree(angleInRadian) {
+    return angleInRadian * 180 / Math.PI
   }
 
   function plotLines (quadrantGroup, quadrant) {
@@ -76,7 +81,7 @@ const Radar = function (size, radar) {
         .innerRadius(ringCalculator.getRadius(i))
         .outerRadius(ringCalculator.getRadius(i + 1))
         .startAngle(toRadian(quadrant.startAngle))
-        .endAngle(toRadian(quadrant.startAngle - 90))
+        .endAngle(toRadian(quadrant.startAngle + GLOBS.QUADRANT_SIZE))
 
       quadrantGroup.append('path')
         .attr('d', arc)
@@ -137,17 +142,40 @@ const Radar = function (size, radar) {
     return table.append('ul')
   }
 
+  /*
+   * Generates random blip coordinates within quadrant constraints.
+   *
+   * The following constraints are observed:
+   * 1. Radial location: Blips must not touch the ring's edges (min & max radius)
+   * 2. Angular location: Blips must not touch the quadrant's edges (startAngle, startAngle+60)
+   */
   function calculateBlipCoordinates (blip, chance, minRadius, maxRadius, startAngle) {
-    var adjustX = Math.sin(toRadian(startAngle)) - Math.cos(toRadian(startAngle))
-    var adjustY = -Math.cos(toRadian(startAngle)) - Math.sin(toRadian(startAngle))
+    // STEP 1 - Randomly select a radius within constraint 1
+    //          Restrict radius range by blip width. To accommodate the edge case in
+    //          the innermost ring, we add a safety margin to the minimum radius 
+    //          at the expense of space available to place blips.
+    var radius = chance.floating({min: minRadius + blip.width / 2 + 5, 
+                                  max: maxRadius - blip.width / 2 })
+    // STEP 2a - Calculate angular limits to respect constraint 2
+    //           The angular spectrum is constrained by the blip's width *and* the 
+    //           (randomly) chosen radius.
+    var angleDelta = toDegree(Math.asin(blip.width / 2 / radius))
+    // We also need to accommodate the edge case of a radius that causes the full
+    // blip width to be wider than the quadrant's angle (90 degre for 4 quadtants, and
+    // 60 degree for 6 quadrants). In this case we simply set the constraint to half of
+    // the segment's degree size
+    angleDelta = angleDelta > GLOBS.QUADRANT_SIZE/2 ? GLOBS.QUADRANT_SIZE/2 : angleDelta
+    // STEP 2b - Randomly select an angle on where to plot the blip
+    var angle = toRadian(chance.integer({ min: angleDelta, 
+                                          max: GLOBS.QUADRANT_SIZE - angleDelta }))
 
-    var radius = chance.floating({ min: minRadius + blip.width / 2, max: maxRadius - blip.width / 2 })
-    var angleDelta = Math.asin(blip.width / 2 / radius) * 180 / Math.PI
-    angleDelta = angleDelta > 45 ? 45 : angleDelta
-    var angle = toRadian(chance.integer({ min: angleDelta, max: 90 - angleDelta }))
+    // STEP 3 - Adjust angle according to configured polar rotation
+    angle = angle + toRadian(startAngle + GLOBS.POLAR_OFFSET)
 
-    var x = center() + radius * Math.cos(angle) * adjustX
-    var y = center() + radius * Math.sin(angle) * adjustY
+    // STEP 4 - Translate polar coordinates into cartesian coordinates (while respecting
+    // the inverted y axis of computer graphics)
+    var x = center() + radius * Math.cos(angle)
+    var y = center() + radius * Math.sin(angle)
 
     return [x, y]
   }
@@ -631,8 +659,8 @@ const Radar = function (size, radar) {
 
     _.each(quadrants, function (quadrant) {
       var quadrantGroup = plotQuadrant(rings, quadrant)
-      plotLines(quadrantGroup, quadrant)
-      plotTexts(quadrantGroup, rings, quadrant)
+      // plotLines(quadrantGroup, quadrant)
+      // plotTexts(quadrantGroup, rings, quadrant)
       plotBlips(quadrantGroup, rings, quadrant)
     })
 

@@ -14,10 +14,10 @@ const Radar = function (staticRings) {
 
   addingQuadrant = 0
   quadrants = [
-    { order: 'first', startAngle: 90 },
-    { order: 'second', startAngle: 0 },
-    { order: 'third', startAngle: -90 },
-    { order: 'fourth', startAngle: -180 }
+    { order: 'first' , startAngle: 0},
+    { order: 'second', startAngle: 60},
+    { order: 'third' , startAngle: 120},
+    { order: 'fourth', startAngle: 180}
   ]
   alternatives = []
   currentSheetName = ''
