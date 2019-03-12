@@ -13,11 +13,14 @@ const Radar = function (staticRings) {
   var self, quadrants, addingQuadrant, alternatives, currentSheetName
 
   addingQuadrant = 0
-  quadrants = [
+  quadrants = [ // this list must correspond to the number of quardant names defined in globals.js
     { order: 'first' , startAngle: 0},
     { order: 'second', startAngle: 60},
     { order: 'third' , startAngle: 120},
-    { order: 'fourth', startAngle: 180}
+    // { order: 'fourth', startAngle: 180}
+    { order: 'fourth', startAngle: 180},
+    { order: 'fifth',  startAngle: 240},
+    { order: 'sixth',  startAngle: 300}
   ]
   alternatives = []
   currentSheetName = ''
@@ -40,16 +43,11 @@ const Radar = function (staticRings) {
   }
 
   self.addQuadrant = function (quadrant) {
-    if (addingQuadrant >= 4) {
-      throw new MalformedDataError(ExceptionMessages.TOO_MANY_QUADRANTS)
-    }
     quadrants[addingQuadrant].quadrant = quadrant
     addingQuadrant++
   }
 
   function allQuadrants () {
-    if (addingQuadrant < 4) { throw new MalformedDataError(ExceptionMessages.LESS_THAN_FOUR_QUADRANTS) }
-
     return _.map(quadrants, 'quadrant')
   }
 

@@ -11,11 +11,11 @@ const ExceptionMessages = {
   // Quadrant related error messages
   TOO_MANY_QUADRANTS:       'There are more than 4 quadrant names listed in your data. Check the ' +
                             ' quadrant column for errors.',
-  LESS_THAN_FOUR_QUADRANTS: 'There are less than 4 quadrant names listed in your data. Check the ' +
-                            'quadrant column for errors.',
 
   // Ring related error messages
   TOO_MANY_RINGS:           'More than ' + GLOBS.COLUMN_NAMES.length + ' rings defined in sheet!',
+  WRONG_RING_NAMES:         'Wrong ring names used in the input data. Make sure that you use only the '+
+                            'following ring names: ' + GLOBS.RING_NAMES.toString(),
 
   // Other
   UNAUTHORIZED: 'UNAUTHORIZED'
