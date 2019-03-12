@@ -27,34 +27,32 @@ const GLOBS = require('../models/globals')
 const plotRadar = function (title, blips, currentRadarName, alternativeRadars) {
   document.title = title
   d3.selectAll('.loading').remove()
-
-  var sheetRings = _.map(_.uniqBy(blips, 'ring'), 'ring')
-  var ringMap = {}
-  var rings = []
-
-  // check too many rings defined
-  if (sheetRings.length > GLOBS.RING_NAMES.length) {
-    throw new MalformedDataError(ExceptionMessages.TOO_MANY_RINGS)
-  }
-
+  
   // create static Ring map as per global definition
+  var ringMap = {}  // a hash map mapping a ring's name to a Ring instance
+  var rings = []    // array of Ring instances - used in the Radar model
   _.each(GLOBS.RING_NAMES, function (ringName, i) {
     var r = new Ring(ringName, i)
     ringMap[ringName] = r
     rings.push(r)
   })
 
-  var quadrants = {}
+  // create a static quadrant map (segments, actually) as per global definition
+  var quadrants = {} // maps quadrant name to Quadrant instance
+  _.each(GLOBS.QUADRANT_NAMES, function (name, i) {
+    var q = new Quadrant(name, i)
+    quadrants[name] = q
+  })
+
+
   var numIgnored = 0;
+  console.dir(quadrants)
   _.each(blips, function (blip) {
     // regard only those blips with valid ring names
     if (!ringMap[blip.ring]) {
       numIgnored++
       console.log("Ignoring blip " + blip.id + " - " + blip.name)
     } else {
-      if (!quadrants[blip.quadrant]) {
-        quadrants[blip.quadrant] = new Quadrant(_.capitalize(blip.quadrant))
-      }
       quadrants[blip.quadrant].add(new Blip(blip.id, blip.name, ringMap[blip.ring], blip.isNew.toLowerCase() === 'true', blip.topic, blip.description))
     }
   })
@@ -64,6 +62,7 @@ const plotRadar = function (title, blips, currentRadarName, alternativeRadars) {
 
   var radar = new Radar(rings)
   _.each(quadrants, function (quadrant) {
+    console.log("Adding quadrant '" + quadrant.name() + "' to the radar.")
     radar.addQuadrant(quadrant)
   })
 
@@ -129,17 +128,16 @@ const GoogleSheet = function (sheetReference, sheetName) {
         }
         var columnNames = tabletop.sheets(sheetName).columnNames
 
-        // nice try...
-        var contentValidator = new ContentValidator(columnNames)
-        contentValidator.verifyContent() // useless in the current version. Leaving it in for now...
-        contentValidator.verifyHeaders() // that's better!
-
-        // fetch all rows of the selected sheet - I hope this is the lazy pull, otherwise
-        // Tabletop is a resource waster!
+        // fetch all rows of the selected sheet
         var all = tabletop.sheets(sheetName).all()
-
         // create the blips off the pulled data
         var blips = _.map(all, new InputSanitizer().sanitize)
+
+        //validate the content against our requirements
+        var contentValidator = new ContentValidator()
+        contentValidator.verifyHeaders(columnNames) // that's better!
+        contentValidator.verifyContent(blips)
+
 
         // ... aaaaand plot the resulting HTML page!
         plotRadar(tabletop.googleSheetName + ' - ' + sheetName, blips, sheetName, tabletop.foundSheetNames)
@@ -201,11 +199,6 @@ const GoogleSheetInput = function () {
     //             if undefined, the first is used
     var queryString = window.location.href.match(/sheetId(.*)/)       // test if called via form
     var queryParams = queryString ? QueryParams(queryString[0]) : {}  // sanitised verison of queryString
-
-    // some logging
-    console.log("domainName = " + domainName)
-    console.log("queryParams.sheetId = " + queryParams.sheetId)
-    console.log("queryParams.sheetName = " + queryParams.sheetName)
 
     // got called as part of the default form
     // ==> load the provided Google sheet
