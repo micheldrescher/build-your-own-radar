@@ -283,22 +283,34 @@ body {
 
       &.second {
         &.selected {
-          float: left;
+          float: right;
         }
       }
 
       &.third {
         &.selected {
-          float: left;
+          float: right;
         }
       }
 
       &.fourth {
         &.selected {
-          float: right;
+          float: left;
         }
       }
 
+      &.fifth {
+        &.selected {
+          float: left;
+        }
+      }
+
+      &.sixth {
+        &.selected {
+          float: left;
+        }
+      }
+      
       &.selected {
         position: relative;
         max-height: 10000px;

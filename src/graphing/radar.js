@@ -70,6 +70,7 @@ const Radar = function (size, radar) {
   }
 
   function plotQuadrant (rings, quadrant) {
+    console.log("NOW PLOTTING QUADRANT")
     var quadrantGroup = svg.append('g')
       .attr('class', 'quadrant-group quadrant-group-' + quadrant.order)
       .on('mouseover', mouseoverQuadrant.bind({}, quadrant.order))
@@ -501,7 +502,9 @@ const Radar = function (size, radar) {
         .on('click', selectQuadrant.bind({}, quadrant.order, quadrant.startAngle))
     }
 
-    _.each([0, 1, 2, 3], function (i) {
+    // this is originally hardcoded to four quadrants. This array must correspond to
+    // the number of quadrants defined in globals.js
+    _.each([0, 1, 2, 3, 4, 5], function (i) {
       addButton(quadrants[i])
     })
 
@@ -552,7 +555,19 @@ const Radar = function (size, radar) {
     d3.selectAll('.quadrant-group:not(.quadrant-group-' + order + ')').style('opacity', 1)
   }
 
+  /**
+   * A quadrant (or the corresponding button) has been clicked.
+   * 
+   * Action: Hide all other quadrants and zoom into the selected one.
+   * 
+   * @param {*} order 
+   * @param {*} startAngle 
+   */
   function selectQuadrant (order, startAngle) {
+    console.log("order = " + order + ", startAngle = " + startAngle)
+    console.log("SELECT QUADRANT inner width = " + window.innerWidth)
+    console.log("SELECT QUADRANT size = " + size)
+
     d3.selectAll('.home-link').classed('selected', false)
     createHomeLink(d3.select('header'))
 
@@ -564,8 +579,25 @@ const Radar = function (size, radar) {
 
     var scale = 2
 
-    var adjustX = Math.sin(toRadian(startAngle)) - Math.cos(toRadian(startAngle))
-    var adjustY = Math.cos(toRadian(startAngle)) + Math.sin(toRadian(startAngle))
+    // ORIGINAL
+    // var adjustX = Math.sin(toRadian(startAngle)) - Math.cos(toRadian(startAngle))
+    // var adjustY = Math.cos(toRadian(startAngle)) + Math.sin(toRadian(startAngle))
+
+    // HACK
+    var adjustX = 0
+    if (startAngle < 180) {
+      adjustX = 1
+    } else {
+      adjustX = -1
+    }
+
+    var adjustY = 0
+    if (startAngle === 0 || startAngle === 300) {
+      adjustY = 1
+    } else if (startAngle === 120 || startAngle === 180) {
+      adjustY = -1
+    }
+    // HACK END
 
     var translateX = (-1 * (1 + adjustX) * size / 2 * (scale - 1)) + (-adjustX * (1 - scale / 2) * size)
     var translateY = (-1 * (1 - adjustY) * (size / 2 - 7) * (scale - 1)) - ((1 - adjustY) / 2 * (1 - scale / 2) * size)
@@ -578,6 +610,12 @@ const Radar = function (size, radar) {
 
     var blipScale = 3 / 4
     var blipTranslate = (1 - blipScale) / blipScale
+
+    console.log("adjustX = " + adjustX + " adjustY = " + adjustY + 
+                " translateX = " + translateX + " translateY = " + translateY +
+                " translateXAll = " + translateXAll + " translateYAll = " + translateYAll +
+                " moveRight = " + moveRight + " moveLeft = " + moveLeft)
+
 
     svg.style('left', moveLeft + 'px').style('right', moveRight + 'px')
     d3.select('.quadrant-group-' + order)
