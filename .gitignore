@@ -5,6 +5,8 @@ dist
 *.swp
 *.swo
 
+*.xlsx
+
 coverage/
 
 .idea/
