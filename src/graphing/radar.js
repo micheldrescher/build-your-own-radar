@@ -155,8 +155,11 @@ const Radar = function (size, radar) {
     //          Restrict radius range by blip width. To accommodate the edge case in
     //          the innermost ring, we add a safety margin to the minimum radius 
     //          at the expense of space available to place blips.
-    var radius = chance.floating({min: minRadius + blip.width / 2 + 5, 
-                                  max: maxRadius - blip.width / 2 })
+    var radius = chance.floating({min: minRadius + blip.width / 2, 
+      max: maxRadius - blip.width / 2 })
+    // var radius = chance.floating({min: minRadius + blip.width / 2 + 5, 
+    //                               max: maxRadius - blip.width / 2 })
+
     // STEP 2a - Calculate angular limits to respect constraint 2
     //           The angular spectrum is constrained by the blip's width *and* the 
     //           (randomly) chosen radius.
