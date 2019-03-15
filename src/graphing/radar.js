@@ -28,12 +28,15 @@ const Radar = function (size, radar) {
     return 'n'
   })
 
+  // need to calculate more space/center offset for labels
+  // var ringCalculator = new RingCalculator(radar.rings().length, center()-30)
   var ringCalculator = new RingCalculator(radar.rings().length, center())
 
   var self = {}
   var chance
 
   function center () {
+    // return Math.round(size / 2) + 30
     return Math.round(size / 2)
   }
 
@@ -46,27 +49,29 @@ const Radar = function (size, radar) {
   }
 
   function plotLines (quadrantGroup, quadrant) {
-    var startX = size * (1 - (-Math.sin(toRadian(quadrant.startAngle)) + 1) / 2)
-    var endX = size * (1 - (-Math.sin(toRadian(quadrant.startAngle - 90)) + 1) / 2)
 
-    var startY = size * (1 - (Math.cos(toRadian(quadrant.startAngle)) + 1) / 2)
-    var endY = size * (1 - (Math.cos(toRadian(quadrant.startAngle - 90)) + 1) / 2)
+    // line start positions are always center
+    var startX = center()
+    var startY = center()
 
-    if (startY > endY) {
-      var aux = endY
-      endY = startY
-      startY = aux
-    }
+    // line endpoints depends on start angle, offset by center()
+    // for line 1 ("left" of segment), svg oddities require us to subtract 90 degrees from start angle
+    var endX1 = center() + (size * Math.cos(toRadian(quadrant.startAngle-90)) / 2)
+    var endY1 = center() + (size * Math.sin(toRadian(quadrant.startAngle-90)) / 2)
+    // for line 2 ("right" of segment), svg oddities require us to subtract 30 degrees from start angle
+    var endX2 = center() + (size * Math.cos(toRadian(quadrant.startAngle-30)) / 2)
+    var endY2 = center() + (size * Math.sin(toRadian(quadrant.startAngle-30)) / 2)
 
+    // drawing "left" line
     quadrantGroup.append('line')
-      .attr('x1', center()).attr('x2', center())
-      .attr('y1', startY - 2).attr('y2', endY + 2)
-      .attr('stroke-width', 10)
-
+        .attr('stroke-width', 5)
+        .attr('x1', startX).attr('y1', startY)
+        .attr('x2', endX1).attr('y2', endY1)
+    // draw "right" line
     quadrantGroup.append('line')
-      .attr('x1', endX).attr('y1', center())
-      .attr('x2', startX).attr('y2', center())
-      .attr('stroke-width', 10)
+        .attr('stroke-width', 5)
+        .attr('x1', startX).attr('y1', startY)
+        .attr('x2', endX2).attr('y2', endY2)
   }
 
   function plotQuadrant (rings, quadrant) {
@@ -78,16 +83,31 @@ const Radar = function (size, radar) {
       .on('click', selectQuadrant.bind({}, quadrant.order, quadrant.startAngle))
 
     rings.forEach(function (ring, i) {
+      // create the arc for each ring
       var arc = d3.arc()
         .innerRadius(ringCalculator.getRadius(i))
         .outerRadius(ringCalculator.getRadius(i + 1))
         .startAngle(toRadian(quadrant.startAngle))
         .endAngle(toRadian(quadrant.startAngle + GLOBS.QUADRANT_SIZE))
 
+      // add it to the quadrant group
       quadrantGroup.append('path')
         .attr('d', arc)
         .attr('class', 'ring-arc-' + ring.order())
+        // setting the attribute is a nasty hack as it hardcodes the last/outermost ring
+        .attr('id', i === 4 ? 'text-path-'+quadrant.order : '')
         .attr('transform', 'translate(' + center() + ', ' + center() + ')')
+
+      // for the last ring, add a text that follows the path
+      if (i === 4) {
+        quadrantGroup.append('text')
+          .attr('dy', -10)      // a y offset to not set directly on the arc
+          .append('textPath') //append a textPath to the text element
+          .attr('xlink:href', '#text-path-'+quadrant.order) //place the ID of the path here
+          .style("text-anchor","middle") //place the text halfway on the arc
+          .attr("startOffset", "25%")   // centered along the path
+          .text(quadrant.label);
+      }
     })
 
     return quadrantGroup
@@ -694,14 +714,17 @@ const Radar = function (size, radar) {
 
     plotQuadrantButtons(quadrants, header)
 
+    // radarElement.style('height', size + 60 + 'px').style('width', size+60+'px')
     radarElement.style('height', size + 14 + 'px')
+
     svg = radarElement.append('svg').call(tip)
     svg.attr('id', 'radar-plot').attr('width', size).attr('height', size + 14)
+    // svg.attr('id', 'radar-plot').attr('width', size+60).attr('height', size + 60)
 
     _.each(quadrants, function (quadrant) {
       var quadrantGroup = plotQuadrant(rings, quadrant)
-      // plotLines(quadrantGroup, quadrant)
       // plotTexts(quadrantGroup, rings, quadrant)
+      plotLines(quadrantGroup, quadrant)
       plotBlips(quadrantGroup, rings, quadrant)
     })
 
