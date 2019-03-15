@@ -58,6 +58,14 @@ body {
     &.fourth .quadrant-table__name {
       color: $violet;
     }
+
+    &.fifth .quadrant-table__name {
+      color: $yellow;
+    }
+
+    &.fifth .quadrant-table__name {
+      color: $purple;
+    }
   }
 
   .quadrant-table {
@@ -233,10 +241,20 @@ body {
           fill: $violet;
           stroke: none;
         }
+
+        &.fifth {
+          fill: $yellow;
+          stroke: none;
+        }
+
+        &.sixth {
+          fill: $purple;
+          stroke: none;
+        }
       }
 
       line {
-        stroke: white;
+        stroke: black;
       }
 
       text {

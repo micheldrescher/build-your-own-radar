@@ -120,6 +120,16 @@ header {
         color: white;
         background-color: $violet;
       }
+
+      &.fifth {
+        color: white;
+        background-color: $yellow;
+      }
+
+      &.sixth {
+        color: white;
+        background-color: $purple;
+      }
     }
 
     &.full-view {
@@ -142,6 +152,16 @@ header {
       &.fourth {
         background-color: $violet;
         color: $white;
+      }
+
+      &.fifth {
+        color: black;
+        background-color: $yellow;
+      }
+
+      &.sixth {
+        color: white;
+        background-color: $purple;
       }
     }
   }

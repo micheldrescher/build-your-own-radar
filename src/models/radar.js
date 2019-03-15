@@ -14,13 +14,12 @@ const Radar = function (staticRings) {
 
   addingQuadrant = 0
   quadrants = [ // this list must correspond to the number of quardant names defined in globals.js
-    { order: 'first' , startAngle: 0},
-    { order: 'second', startAngle: 60},
-    { order: 'third' , startAngle: 120},
-    // { order: 'fourth', startAngle: 180}
-    { order: 'fourth', startAngle: 180},
-    { order: 'fifth',  startAngle: 240},
-    { order: 'sixth',  startAngle: 300}
+    { order: 'first' , startAngle: 0, label: 'Secure Systems'},
+    { order: 'second', startAngle: 60, label: 'Verification & Assurance'},
+    { order: 'third' , startAngle: 120, label: 'Operational Risk'},
+    { order: 'fourth', startAngle: 180, label: 'Identity & Privacy'},
+    { order: 'fifth',  startAngle: 240, label: 'Cybersecurity Governance'},
+    { order: 'sixth',  startAngle: 300, label: 'Human Aspects'}
   ]
   alternatives = []
   currentSheetName = ''
