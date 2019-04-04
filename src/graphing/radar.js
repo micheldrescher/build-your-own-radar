@@ -28,15 +28,12 @@ const Radar = function (size, radar) {
     return 'n'
   })
 
-  // need to calculate more space/center offset for labels
-  // var ringCalculator = new RingCalculator(radar.rings().length, center()-30)
   var ringCalculator = new RingCalculator(radar.rings().length, center())
 
   var self = {}
   var chance
 
   function center () {
-    // return Math.round(size / 2) + 30
     return Math.round(size / 2)
   }
 
@@ -95,19 +92,19 @@ const Radar = function (size, radar) {
         .attr('d', arc)
         .attr('class', 'ring-arc-' + ring.order())
         // setting the attribute is a nasty hack as it hardcodes the last/outermost ring
-        .attr('id', i === 4 ? 'text-path-'+quadrant.order : '')
+        // .attr('id', i === 4 ? 'text-path-'+quadrant.order : '')
         .attr('transform', 'translate(' + center() + ', ' + center() + ')')
 
       // for the last ring, add a text that follows the path
-      if (i === 4) {
-        quadrantGroup.append('text')
-          .attr('dy', -10)      // a y offset to not set directly on the arc
-          .append('textPath') //append a textPath to the text element
-          .attr('xlink:href', '#text-path-'+quadrant.order) //place the ID of the path here
-          .style("text-anchor","middle") //place the text halfway on the arc
-          .attr("startOffset", "25%")   // centered along the path
-          .text(quadrant.label);
-      }
+      // if (i === 4) {
+      //   quadrantGroup.append('text')
+      //     .attr('dy', -10)      // a y offset to not set directly on the arc
+      //     .append('textPath') //append a textPath to the text element
+      //     .attr('xlink:href', '#text-path-'+quadrant.order) //place the ID of the path here
+      //     .style("text-anchor","middle") //place the text halfway on the arc
+      //     .attr("startOffset", "25%")   // centered along the path
+      //     .text(quadrant.label);
+      // }
     })
 
     return quadrantGroup
@@ -570,12 +567,21 @@ const Radar = function (size, radar) {
   }
 
   function mouseoverQuadrant (order) {
+    // highlight the selected segment
     d3.select('.quadrant-group-' + order).style('opacity', 1)
+    // dim the non-selected segment
     d3.selectAll('.quadrant-group:not(.quadrant-group-' + order + ')').style('opacity', 0.3)
+    // highlight the segment's button
+    d3.select('.button.' + order + '.full-view').style('opacity', 1)
+    // dim all other buttons
+    d3.selectAll('.button.full-view:not(.' + order+')').style('opacity', 0.3)
   }
 
   function mouseoutQuadrant (order) {
+    // reset all dimming/highlighting on the segment
     d3.selectAll('.quadrant-group:not(.quadrant-group-' + order + ')').style('opacity', 1)
+    // reset all dimming for the buttons
+    d3.selectAll('.button.full-view').style('opacity', 1)
   }
 
   /**
@@ -714,12 +720,10 @@ const Radar = function (size, radar) {
 
     plotQuadrantButtons(quadrants, header)
 
-    // radarElement.style('height', size + 60 + 'px').style('width', size+60+'px')
     radarElement.style('height', size + 14 + 'px')
 
     svg = radarElement.append('svg').call(tip)
     svg.attr('id', 'radar-plot').attr('width', size).attr('height', size + 14)
-    // svg.attr('id', 'radar-plot').attr('width', size+60).attr('height', size + 60)
 
     _.each(quadrants, function (quadrant) {
       var quadrantGroup = plotQuadrant(rings, quadrant)
