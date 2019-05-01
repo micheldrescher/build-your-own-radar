@@ -371,12 +371,18 @@ body {
 
             p {
               margin: 0;
-              border-top: 1px solid rgb(119, 119, 119);
-              border-bottom: 1px solid rgb(119, 119, 119);
-              padding: 20px;
+              padding: 0px 20px;
               color: $grey-text;
               font-weight: 100;
               font-size: 14px;
+            }
+            p:first-of-type {
+              padding: 10px 20px 0 20px;
+              border-top: 1px solid rgb(119, 119, 119);
+            }
+            p:last-of-type {
+              padding: 0 20px 10px 20px;
+              border-bottom: 1px solid rgb(119, 119, 119);
             }
 
             transition: max-height 0.2s ease;

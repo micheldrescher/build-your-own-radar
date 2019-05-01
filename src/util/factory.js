@@ -53,7 +53,9 @@ const plotRadar = function (title, blips, currentRadarName, alternativeRadars) {
       numIgnored++
       console.log("Ignoring blip " + blip.id + " - " + blip.name)
     } else {
-      quadrants[blip.quadrant].add(new Blip(blip.id, blip.name, ringMap[blip.ring], blip.isNew.toLowerCase() === 'true', blip.topic, blip.description))
+      quadrants[blip.quadrant].add(
+        new Blip(blip.id, blip.name, ringMap[blip.ring], blip.quadrant, blip.description,
+                 blip.TRL, blip.MRL, blip.Performance, blip.Min, blip.Max))
     }
   })
   if (numIgnored > 0) {

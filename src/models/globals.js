@@ -20,7 +20,16 @@ const Definitions = {
     // Degrees of polar coordinate rotation to alleviate flipped y axis in computer graphics
     // but keeping clockwise rotation (trigonometric unit circle is anti-clockwise
     // Will be used in conjunction with the quadrant size, whether static or computed (see above)
-    POLAR_OFFSET: -90
+    POLAR_OFFSET: -90,
+
+    // Gradient colours for visualising relative TRL/MRL performance against the projects in 
+    // the same ring and segment. Gradients are ordered from "worst" to "best" in colour
+    GRADIENTS: ['#FF0000', // red
+                '#FF7F00', // orange
+                '#FFFF00', // yellow
+                '#BFFF00', // light-green'
+                '#00FF00'  // lime
+                ]
 
 }
 

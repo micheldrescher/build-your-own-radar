@@ -130,22 +130,34 @@ const Radar = function (size, radar) {
     })
   }
 
-  // function triangle (blip, x, y, order, group) {
-  //   return group.append('path').attr('d', 'M412.201,311.406c0.021,0,0.042,0,0.063,0c0.067,0,0.135,0,0.201,0c4.052,0,6.106-0.051,8.168-0.102c2.053-0.051,4.115-0.102,8.176-0.102h0.103c6.976-0.183,10.227-5.306,6.306-11.53c-3.988-6.121-4.97-5.407-8.598-11.224c-1.631-3.008-3.872-4.577-6.179-4.577c-2.276,0-4.613,1.528-6.48,4.699c-3.578,6.077-3.26,6.014-7.306,11.723C402.598,306.067,405.426,311.406,412.201,311.406')
-  //     .attr('transform', 'scale(' + (blip.width / 34) + ') translate(' + (-404 + x * (34 / blip.width) - 17) + ', ' + (-282 + y * (34 / blip.width) - 17) + ')')
-  //     .attr('class', order)
-  // }
-
-  // function triangleLegend (x, y, group) {
-  //   return group.append('path').attr('d', 'M412.201,311.406c0.021,0,0.042,0,0.063,0c0.067,0,0.135,0,0.201,0c4.052,0,6.106-0.051,8.168-0.102c2.053-0.051,4.115-0.102,8.176-0.102h0.103c6.976-0.183,10.227-5.306,6.306-11.53c-3.988-6.121-4.97-5.407-8.598-11.224c-1.631-3.008-3.872-4.577-6.179-4.577c-2.276,0-4.613,1.528-6.48,4.699c-3.578,6.077-3.26,6.014-7.306,11.723C402.598,306.067,405.426,311.406,412.201,311.406')
-  //     .attr('transform', 'scale(' + (22 / 64) + ') translate(' + (-404 + x * (64 / 22) - 17) + ', ' + (-282 + y * (64 / 22) - 17) + ')')
-  // }
-
   function circle (blip, x, y, order, group) {
-    return (group || svg).append('path')
+    var path = (group || svg).append('path')
       .attr('d', 'M420.084,282.092c-1.073,0-2.16,0.103-3.243,0.313c-6.912,1.345-13.188,8.587-11.423,16.874c1.732,8.141,8.632,13.711,17.806,13.711c0.025,0,0.052,0,0.074-0.003c0.551-0.025,1.395-0.011,2.225-0.109c4.404-0.534,8.148-2.218,10.069-6.487c1.747-3.886,2.114-7.993,0.913-12.118C434.379,286.944,427.494,282.092,420.084,282.092')
       .attr('transform', 'scale(' + (blip.width / 34) + ') translate(' + (-404 + x * (34 / blip.width) - 17) + ', ' + (-282 + y * (34 / blip.width) - 17) + ')')
       .attr('class', order)
+      // if we have MRL and TRL, colour in the circle!
+      if (blip.TRL() != '' || blip.MRL() != '') {
+        var colour = gradientColour(blip.number(), blip.performance(), blip.min(), blip.max())
+        path = path.attr('style', 'fill: '+colour)
+      } 
+      return path
+  }
+
+  // Returns the colour code for the blip based on its performans, and the min and max 
+  // performance of related projects
+  function gradientColour (num, perf, min, max) {
+    // first check if min and max are 0 
+    // This means that there is either only one project scored, or all with the same scores
+    // In that case, return "yellow"
+    if (min == 0 && max == 0) return GLOBS.GRADIENTS[2]
+
+    // now calculate the index
+    var chunkSize = (max - min) / GLOBS.GRADIENTS.length
+    var idx = Math.floor((perf - min) / ( chunkSize ))
+    // for performance values same as max, index will return 5 - adjust this to 4
+    idx = (idx == 5 ? 4 : idx )
+
+    return GLOBS.GRADIENTS[idx]
   }
 
   function circleLegend (x, y, group) {
@@ -282,6 +294,11 @@ const Radar = function (size, radar) {
     }
   }
 
+  var mtrl = function (trl, mrl) {
+    return "TRL: <b>" + trl + "</b> -  MRL: <b>" + mrl + "</b>"
+  }
+
+
   function drawBlipInCoordinates (blip, coordinates, order, quadrantGroup, ringList) {
     var x = coordinates[0]
     var y = coordinates[1]
@@ -312,7 +329,8 @@ const Radar = function (size, radar) {
       .text(blip.number())
 
     var blipListItem = ringList.append('li')
-    var blipText = blip.number() + '. ' + blip.name() + (blip.topic() ? ('. - ' + blip.topic()) : '')
+    // var blipText = blip.number() + '. ' + blip.name() + (blip.quadrant() ? ('. - ' + blip.quadrant()) : '')
+    var blipText = blip.number() + '. ' + blip.name()
     blipListItem.append('div')
       .attr('class', 'blip-list-item')
       .attr('id', 'blip-list-item-' + blip.number())
@@ -321,9 +339,9 @@ const Radar = function (size, radar) {
     var blipItemDescription = blipListItem.append('div')
       .attr('id', 'blip-description-' + blip.number())
       .attr('class', 'blip-item-description')
-    if (blip.description()) {
-      blipItemDescription.append('p').html(blip.description())
-    }
+    
+    if (blip.TRL() && blip.MRL()) { blipItemDescription.append('p').html( mtrl(blip.TRL(), blip.MRL()))  }
+    if (blip.description()) {       blipItemDescription.append('p').html(blip.description())         }
 
     var mouseOver = function () {
       d3.selectAll('g.blip-link').attr('opacity', 0.3)
@@ -658,12 +676,6 @@ const Radar = function (size, radar) {
 
     var blipScale = 3 / 4
     var blipTranslate = (1 - blipScale) / blipScale
-
-    console.log("adjustX = " + adjustX + " adjustY = " + adjustY + 
-                " translateX = " + translateX + " translateY = " + translateY +
-                " translateXAll = " + translateXAll + " translateYAll = " + translateYAll +
-                " moveRight = " + moveRight + " moveLeft = " + moveLeft)
-
 
     svg.style('left', moveLeft + 'px').style('right', moveRight + 'px')
     d3.select('.quadrant-group-' + order)
