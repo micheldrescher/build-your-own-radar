@@ -185,6 +185,7 @@ body {
         color: $black;
       }
 
+      // These are the colours for the rings
       path {
         &.ring-arc-4 {
           stroke: none;
@@ -220,48 +221,55 @@ body {
       .quadrant-group {
         cursor: pointer;
       }
-
+      // These are the colours for the blips - REMOVE!
+      /*
       circle, polygon, path {
         &.first {
           fill: $green;
           stroke: none;
         }
-
+        
         &.second {
           fill: $blue;
           stroke: none;
         }
-
+        
         &.third {
           fill: $orange;
           stroke: none;
         }
-
+        
         &.fourth {
           fill: $violet;
           stroke: none;
         }
-
+        
         &.fifth {
           fill: $yellow;
           stroke: none;
         }
-
+        
         &.sixth {
           fill: $purple;
           stroke: none;
         }
       }
-
+      */
+            path {
+              &.first, &.second, &.third, &.fourth, &.fifth, &.sixth { 
+                fill: white;
+              }
+            }
+      
       line {
         stroke: black;
       }
-
+      
       text {
         &.blip-text {
           font-size: 9px;
-          font-style: italic;
-          fill: $white;
+          // font-style: italic;
+          fill: black;
         }
 
         &.line-text {

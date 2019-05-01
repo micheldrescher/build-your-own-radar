@@ -61,12 +61,12 @@ const Radar = function (size, radar) {
 
     // drawing "left" line
     quadrantGroup.append('line')
-        .attr('stroke-width', 5)
+        .attr('stroke-width', 4)
         .attr('x1', startX).attr('y1', startY)
         .attr('x2', endX1).attr('y2', endY1)
     // draw "right" line
     quadrantGroup.append('line')
-        .attr('stroke-width', 5)
+        .attr('stroke-width', 4)
         .attr('x1', startX).attr('y1', startY)
         .attr('x2', endX2).attr('y2', endY2)
   }
@@ -91,9 +91,9 @@ const Radar = function (size, radar) {
       quadrantGroup.append('path')
         .attr('d', arc)
         .attr('class', 'ring-arc-' + ring.order())
+        .attr('transform', 'translate(' + center() + ', ' + center() + ')')
         // setting the attribute is a nasty hack as it hardcodes the last/outermost ring
         // .attr('id', i === 4 ? 'text-path-'+quadrant.order : '')
-        .attr('transform', 'translate(' + center() + ', ' + center() + ')')
 
       // for the last ring, add a text that follows the path
       // if (i === 4) {
@@ -130,16 +130,16 @@ const Radar = function (size, radar) {
     })
   }
 
-  function triangle (blip, x, y, order, group) {
-    return group.append('path').attr('d', 'M412.201,311.406c0.021,0,0.042,0,0.063,0c0.067,0,0.135,0,0.201,0c4.052,0,6.106-0.051,8.168-0.102c2.053-0.051,4.115-0.102,8.176-0.102h0.103c6.976-0.183,10.227-5.306,6.306-11.53c-3.988-6.121-4.97-5.407-8.598-11.224c-1.631-3.008-3.872-4.577-6.179-4.577c-2.276,0-4.613,1.528-6.48,4.699c-3.578,6.077-3.26,6.014-7.306,11.723C402.598,306.067,405.426,311.406,412.201,311.406')
-      .attr('transform', 'scale(' + (blip.width / 34) + ') translate(' + (-404 + x * (34 / blip.width) - 17) + ', ' + (-282 + y * (34 / blip.width) - 17) + ')')
-      .attr('class', order)
-  }
+  // function triangle (blip, x, y, order, group) {
+  //   return group.append('path').attr('d', 'M412.201,311.406c0.021,0,0.042,0,0.063,0c0.067,0,0.135,0,0.201,0c4.052,0,6.106-0.051,8.168-0.102c2.053-0.051,4.115-0.102,8.176-0.102h0.103c6.976-0.183,10.227-5.306,6.306-11.53c-3.988-6.121-4.97-5.407-8.598-11.224c-1.631-3.008-3.872-4.577-6.179-4.577c-2.276,0-4.613,1.528-6.48,4.699c-3.578,6.077-3.26,6.014-7.306,11.723C402.598,306.067,405.426,311.406,412.201,311.406')
+  //     .attr('transform', 'scale(' + (blip.width / 34) + ') translate(' + (-404 + x * (34 / blip.width) - 17) + ', ' + (-282 + y * (34 / blip.width) - 17) + ')')
+  //     .attr('class', order)
+  // }
 
-  function triangleLegend (x, y, group) {
-    return group.append('path').attr('d', 'M412.201,311.406c0.021,0,0.042,0,0.063,0c0.067,0,0.135,0,0.201,0c4.052,0,6.106-0.051,8.168-0.102c2.053-0.051,4.115-0.102,8.176-0.102h0.103c6.976-0.183,10.227-5.306,6.306-11.53c-3.988-6.121-4.97-5.407-8.598-11.224c-1.631-3.008-3.872-4.577-6.179-4.577c-2.276,0-4.613,1.528-6.48,4.699c-3.578,6.077-3.26,6.014-7.306,11.723C402.598,306.067,405.426,311.406,412.201,311.406')
-      .attr('transform', 'scale(' + (22 / 64) + ') translate(' + (-404 + x * (64 / 22) - 17) + ', ' + (-282 + y * (64 / 22) - 17) + ')')
-  }
+  // function triangleLegend (x, y, group) {
+  //   return group.append('path').attr('d', 'M412.201,311.406c0.021,0,0.042,0,0.063,0c0.067,0,0.135,0,0.201,0c4.052,0,6.106-0.051,8.168-0.102c2.053-0.051,4.115-0.102,8.176-0.102h0.103c6.976-0.183,10.227-5.306,6.306-11.53c-3.988-6.121-4.97-5.407-8.598-11.224c-1.631-3.008-3.872-4.577-6.179-4.577c-2.276,0-4.613,1.528-6.48,4.699c-3.578,6.077-3.26,6.014-7.306,11.723C402.598,306.067,405.426,311.406,412.201,311.406')
+  //     .attr('transform', 'scale(' + (22 / 64) + ') translate(' + (-404 + x * (64 / 22) - 17) + ', ' + (-282 + y * (64 / 22) - 17) + ')')
+  // }
 
   function circle (blip, x, y, order, group) {
     return (group || svg).append('path')
@@ -288,11 +288,18 @@ const Radar = function (size, radar) {
 
     var group = quadrantGroup.append('g').attr('class', 'blip-link').attr('id', 'blip-link-' + blip.number())
 
-    if (blip.isNew()) {
-      triangle(blip, x, y, order, group)
-    } else {
-      circle(blip, x, y, order, group)
-    }
+    // TODO
+    // Replace with suitable other logic - is new is outdated!
+    // Note that blip is an instance of "spreadsheet cell" (or so), hence 
+    // function "isNew()" is a dynamically derived function from the spreadsheet columns
+    // ----- old code -----
+    // if (blip.isNew()) {
+    //   triangle(blip, x, y, order, group)
+    // } else {
+    //   circle(blip, x, y, order, group)
+    // }
+    // ----- old code END -----
+    circle(blip, x, y, order, group)
 
     group.append('text')
       .attr('x', x)
@@ -370,6 +377,9 @@ const Radar = function (size, radar) {
   }
 
   function drawLegend (order) {
+    // do nothing for now - perhaps add a scale at a later point i ntime?
+    if (true) return
+
     removeRadarLegend()
 
     var triangleKey = 'New or moved'
@@ -528,12 +538,13 @@ const Radar = function (size, radar) {
       addButton(quadrants[i])
     })
 
-    buttonsGroup.append('div')
-      .classed('print-radar-btn', true)
-      .append('div')
-      .classed('print-radar button no-capitalize', true)
-      .text('Print this radar')
-      .on('click', window.print.bind(window))
+    // hide the "Print this radar" button
+    // buttonsGroup.append('div')
+      // .classed('print-radar-btn', true)
+      // .append('div')
+      // .classed('print-radar button no-capitalize', true)
+      // .text('Print this radar')
+      // .on('click', window.print.bind(window))
 
     alternativeDiv.append('div')
       .classed('search-box', true)
@@ -565,23 +576,31 @@ const Radar = function (size, radar) {
       'You also agree to our <a href="https://www.thoughtworks.com/privacy-policy">privacy policy</a>, which describes how we will gather, use and protect any personal data contained in your public Google Sheet. ' +
       'This software is <a href="https://github.com/thoughtworks/build-your-own-radar">open source</a> and available for download and self-hosting.')
   }
-
+  
+  function mouseoverQuadrant (order) {
+    d3.select('.quadrant-group-' + order).style('opacity', 1)
+    d3.selectAll('.quadrant-group:not(.quadrant-group-' + order + ')').style('opacity', 0.3)
+  }
+  
   function mouseoverQuadrant (order) {
     // highlight the selected segment
     d3.select('.quadrant-group-' + order).style('opacity', 1)
-    // dim the non-selected segment
+    // dim the non-selected segments
     d3.selectAll('.quadrant-group:not(.quadrant-group-' + order + ')').style('opacity', 0.3)
     // highlight the segment's button
-    d3.select('.button.' + order + '.full-view').style('opacity', 1)
+    // d3.select('.button.' + order + '.full-view').style('opacity', 1)
     // dim all other buttons
-    d3.selectAll('.button.full-view:not(.' + order+')').style('opacity', 0.3)
+    // d3.selectAll('.button.full-view:not(.' + order+')').style('opacity', 0.3)
   }
-
+  
+  function mouseoutQuadrant (order) {
+    d3.selectAll('.quadrant-group:not(.quadrant-group-' + order + ')').style('opacity', 1)
+  }
   function mouseoutQuadrant (order) {
     // reset all dimming/highlighting on the segment
     d3.selectAll('.quadrant-group:not(.quadrant-group-' + order + ')').style('opacity', 1)
     // reset all dimming for the buttons
-    d3.selectAll('.button.full-view').style('opacity', 1)
+    // d3.selectAll('.button.full-view').style('opacity', 1)
   }
 
   /**
@@ -723,7 +742,7 @@ const Radar = function (size, radar) {
     radarElement.style('height', size + 14 + 'px')
 
     svg = radarElement.append('svg').call(tip)
-    svg.attr('id', 'radar-plot').attr('width', size).attr('height', size + 14)
+    svg.attr('id', 'radar-plot').attr('width', size).attr('height', size+14)
 
     _.each(quadrants, function (quadrant) {
       var quadrantGroup = plotQuadrant(rings, quadrant)

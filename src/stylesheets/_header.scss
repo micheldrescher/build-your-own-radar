@@ -103,65 +103,65 @@ header {
 
       &.first {
         color: white;
-        background-color: $green;
+        background-color: $near-black;
       }
 
       &.second {
         color: white;
-        background-color: $blue;
+        background-color: $near-black;
       }
 
       &.third {
         color: white;
-        background-color: $orange;
+        background-color: $near-black;
       }
 
       &.fourth {
         color: white;
-        background-color: $violet;
+        background-color: $near-black;
       }
 
       &.fifth {
         color: white;
-        background-color: $yellow;
+        background-color: $near-black;
       }
 
       &.sixth {
         color: white;
-        background-color: $purple;
+        background-color: $near-black;
       }
     }
 
     &.full-view {
 
       &.first {
-        background-color: $green;
+        background-color: $near-black;
         color: $white;
       }
 
       &.second {
-        background-color: $blue;
+        background-color: $near-black;
         color: $white;
       }
 
       &.third {
-        background-color: $orange;
+        background-color: $near-black;
         color: $white;
       }
 
       &.fourth {
-        background-color: $violet;
+        background-color: $near-black;
         color: $white;
       }
 
       &.fifth {
-        color: black;
-        background-color: $yellow;
+        background-color: $near-black;
+        color: white;
       }
 
       &.sixth {
+        background-color: $near-black;
         color: white;
-        background-color: $purple;
       }
     }
   }
