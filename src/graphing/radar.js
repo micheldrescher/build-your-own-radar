@@ -61,12 +61,12 @@ const Radar = function (size, radar) {
 
     // drawing "left" line
     quadrantGroup.append('line')
-        .attr('stroke-width', 4)
+        .attr('stroke-width', 2)
         .attr('x1', startX).attr('y1', startY)
         .attr('x2', endX1).attr('y2', endY1)
     // draw "right" line
     quadrantGroup.append('line')
-        .attr('stroke-width', 4)
+        .attr('stroke-width', 2)
         .attr('x1', startX).attr('y1', startY)
         .attr('x2', endX2).attr('y2', endY2)
   }
@@ -80,18 +80,33 @@ const Radar = function (size, radar) {
       .on('click', selectQuadrant.bind({}, quadrant.order, quadrant.startAngle))
 
     rings.forEach(function (ring, i) {
-      // create the arc for each ring
-      var arc = d3.arc()
-        .innerRadius(ringCalculator.getRadius(i))
-        .outerRadius(ringCalculator.getRadius(i + 1))
-        .startAngle(toRadian(quadrant.startAngle))
-        .endAngle(toRadian(quadrant.startAngle + GLOBS.QUADRANT_SIZE))
-
-      // add it to the quadrant group
+      // calculate  key metrics for the arc (and the specific discriminator line)
+      var innerRadius = ringCalculator.getRadius(i)
+      var outerRadius = ringCalculator.getRadius(i + 1)
+      var startAngle =  toRadian(quadrant.startAngle)
+      var endAngle =    toRadian(quadrant.startAngle + GLOBS.QUADRANT_SIZE)
+      // create the main arc for each ring...
+      var arc = d3.arc().innerRadius(innerRadius).outerRadius(outerRadius)
+                        .startAngle(startAngle).endAngle(endAngle)
+      // ... and add it to the quadrant group
       quadrantGroup.append('path')
         .attr('d', arc)
         .attr('class', 'ring-arc-' + ring.order())
         .attr('transform', 'translate(' + center() + ', ' + center() + ')')
+
+      // if we are at the third ring, draw also a black curved line
+      if (i == 2) {
+        console.log("ADDING ARC LINE")
+        var arcLine = d3.arc().innerRadius(outerRadius-1).outerRadius(outerRadius)
+                              .startAngle(startAngle).endAngle(endAngle)
+        quadrantGroup.append('path')
+          .attr('d', arcLine)
+          .attr('class', 'ring-arc-' + ring.order() + '-separator')
+          .attr('transform', 'translate(' + center() + ', ' + center() + ')')
+          .attr('style', 'fill: black;')
+      }
+                      
+      // For the third ring, create 
         // setting the attribute is a nasty hack as it hardcodes the last/outermost ring
         // .attr('id', i === 4 ? 'text-path-'+quadrant.order : '')
 
@@ -340,8 +355,15 @@ const Radar = function (size, radar) {
       .attr('id', 'blip-description-' + blip.number())
       .attr('class', 'blip-item-description')
     
-    if (blip.TRL() && blip.MRL()) { blipItemDescription.append('p').html( mtrl(blip.TRL(), blip.MRL()))  }
-    if (blip.description()) {       blipItemDescription.append('p').html(blip.description())         }
+    // add prose info to the blip
+    if (blip.title()) {             blipItemDescription.append('p').html(blip.title())         }
+
+    var technoDiv = blipItemDescription.append('div').attr('class', 'techno');
+    if (blip.TRL() && blip.MRL()) { technoDiv.append('p').html( mtrl(blip.TRL(), blip.MRL())) }
+    if (blip.type()) {              technoDiv.append('p').html( "Project type: <b>" + blip.type() + "</b>") }
+    if (blip.teaser()) {            blipItemDescription.append('p').html( blip.teaser() ) }
+    // link to cyberwatching.eu webpage
+    if (blip.cwurl()) {             blipItemDescription.append('p').html( '<a href="' + blip.cwurl() + '" target="_blank">More</a>') }
 
     var mouseOver = function () {
       d3.selectAll('g.blip-link').attr('opacity', 0.3)

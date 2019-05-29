@@ -11,6 +11,8 @@ const ExceptionMessages = {
   // Quadrant related error messages
   TOO_MANY_QUADRANTS:       'There are more than 4 quadrant names listed in your data. Check the ' +
                             ' quadrant column for errors.',
+  WRONG_QUADRANT_NAMES:     'Wrong segment names used in the input data. Make sure that you use only the '+
+                            'following ring names: ' + GLOBS.QUADRANT_NAMES.toString(),
 
   // Ring related error messages
   TOO_MANY_RINGS:           'More than ' + GLOBS.COLUMN_NAMES.length + ' rings defined in sheet!',

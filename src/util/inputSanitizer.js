@@ -34,26 +34,25 @@ const InputSanitizer = function () {
     blip.name = sanitizeHtml(blip.name, restrictedOptions)
     blip.ring = sanitizeHtml(blip.ring, restrictedOptions)
     blip.quadrant = sanitizeHtml(blip.quadrant, restrictedOptions)
-    blip.description = sanitizeHtml(blip.description, relaxedOptions)
+    blip.title = sanitizeHtml(blip.title, relaxedOptions)
     return blip
   }
 
   self.sanitizeForProtectedSheet = function (rawBlip, header) {
     var blip = trimWhiteSpaces(rawBlip)
 
-    const descriptionIndex = header.indexOf('description')
+    const titleIndex = header.indexOf('title')
     const nameIndex = header.indexOf('name')
-    const isNewIndex = header.indexOf('isNew')
     const quadrantIndex = header.indexOf('quadrant')
     const ringIndex = header.indexOf('ring')
 
-    const description = descriptionIndex === -1 ? '' : blip[descriptionIndex]
+    const title = titleIndex === -1 ? '' : blip[titleIndex]
     const name = nameIndex === -1 ? '' : blip[nameIndex]
     const isNew = isNewIndex === -1 ? '' : blip[isNewIndex]
     const ring = ringIndex === -1 ? '' : blip[ringIndex]
     const quadrant = quadrantIndex === -1 ? '' : blip[quadrantIndex]
 
-    blip.description = sanitizeHtml(description, relaxedOptions)
+    blip.title = sanitizeHtml(title, relaxedOptions)
     blip.name = sanitizeHtml(name, restrictedOptions)
     blip.isNew = sanitizeHtml(isNew, restrictedOptions)
     blip.ring = sanitizeHtml(ring, restrictedOptions)

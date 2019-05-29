@@ -376,14 +376,18 @@ body {
               font-weight: 100;
               font-size: 14px;
             }
-            p:first-of-type {
-              padding: 10px 20px 0 20px;
+            > p:first-of-type {
+              font-variant: small-caps;
+              font-weight: bold;
+              padding: 10px 20px;
               border-top: 1px solid rgb(119, 119, 119);
             }
-            p:last-of-type {
+            > p:last-of-type {
               padding: 0 20px 10px 20px;
               border-bottom: 1px solid rgb(119, 119, 119);
             }
+            div.techno { padding-bottom: 10px; }
+            div.techno > p { display: inline-block; }
 
             transition: max-height 0.2s ease;
 

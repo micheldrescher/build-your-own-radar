@@ -1,8 +1,8 @@
 const Definitions = {
 
     // column names in the google sheet
-    COLUMN_NAMES: ['id', 'name', 'ring', 'quadrant', 'description',
-                   'TRL', 'MRL', 'Score', 'Median', 'Performance', 'Range', 'Min', 'Max'  ],
+    COLUMN_NAMES: ['id', 'name', 'ring', 'quadrant', 'title', 'type',
+                   'TRL', 'MRL', 'Score', 'Median', 'Performance', 'Min', 'Max', 'teaser', 'cwurl'  ],
 
     // static names of the radar rings - must be in order innermost to outermost!
     RING_NAMES: ['Adopt', 'Trial', 'Assess', 'Hold', 'Drop'],
@@ -31,6 +31,7 @@ const Definitions = {
                 '#00FF00'  // lime
                 ]
 
+                
 }
 
 module.exports = Definitions

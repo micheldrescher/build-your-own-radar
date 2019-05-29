@@ -43,6 +43,7 @@ const ContentValidator = function () {
     // get a list of unique quadrant names and test against our required quadrant names
     // NOTE: Same hardcoding note above for ring names applies here, too
     var sheetQuadrantNames = _.map(_.uniqBy(allBlips, 'quadrant'), 'quadrant')
+    console.log("sheet quadrant names = " + sheetQuadrantNames)
 
     // choke if too many ring names used in the google sheet
     if (sheetRingNames.length > GLOBS.RING_NAMES.length) {
@@ -63,8 +64,9 @@ const ContentValidator = function () {
 
     // choke if we cannit find the required quadrant names
     _.each(sheetQuadrantNames, function (field) {
+      console.log("Checking '" + field + "' against quadrant names --> "+ GLOBS.QUADRANT_NAMES.indexOf(field))
       if (GLOBS.QUADRANT_NAMES.indexOf(field) === -1) {
-        throw new MalformedDataError(ExceptionMessages.WRONG_RING_NAMES)
+        throw new MalformedDataError(ExceptionMessages.WRONG_QUADRANT_NAMES)
       }
     })
 

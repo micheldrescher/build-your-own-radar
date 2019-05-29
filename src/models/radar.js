@@ -26,7 +26,11 @@ const Radar = function (staticRings) {
   self = {}
 
   self.addAlternative = function (sheetName) {
-    alternatives.push(sheetName)
+    // Alternative sheets get added only if they do NOT start with __DATA__
+    console.log(sheetName + ", __DATA__ search = " + sheetName.search("__DATA__"))
+    if (sheetName.search("__DATA__") == -1) {
+      alternatives.push(sheetName)
+    }
   }
 
   self.getAlternatives = function () {
