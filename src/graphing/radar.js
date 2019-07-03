@@ -605,16 +605,22 @@ const Radar = function (size, radar) {
   }
 
   function plotRadarFooter () {
-    d3.select('body')
+    var fc = d3.select('body')
       .insert('div', '#radar-plot + *')
       .attr('id', 'footer')
       .append('div')
       .attr('class', 'footer-content')
-      .append('p')
-      .html('Powered by <a href="https://www.thoughtworks.com"> ThoughtWorks</a>. ' +
-      'By using this service you agree to <a href="https://www.thoughtworks.com/radar/tos">ThoughtWorks\' terms of use</a>. ' +
-      'You also agree to our <a href="https://www.thoughtworks.com/privacy-policy">privacy policy</a>, which describes how we will gather, use and protect any personal data contained in your public Google Sheet. ' +
-      'This software is <a href="https://github.com/thoughtworks/build-your-own-radar">open source</a> and available for download and self-hosting.')
+
+    fc.append('p').html('Powered by <a href="https://www.cyberwatching.eu/">Cyberwatching.eu</a>. ')
+    fc.append('p').html('The Cybersecurity and Privacy Project Radar provides a birdseye view of the ' +
+                        'complete collection of EU funded projects in the cybersecurity space.' +
+                        'Projects with a colour gradient have volunteered in a technology and market readiness assessment by Cyberwatching.eu.')
+    fc.append('p').html('Mouseover the sectors or the buttons to explore sectors.' +
+                        'Click on a sector or button to drill down into individual sectors.')
+    fc.append('p').html('When in sector view, mouseover individual project dots to learn their short name.' +
+                        'Click on a project name in the list view to see its vital statistics. ' +
+                        'Then engage with it more closely via the <a href="https://www.cyberwatching.eu/projects">Cyberwatching.eu project hub</a>.')
+    fc.append('p').html('This software is <a href="https://github.com/micheldrescher/cyberwatching_radar">open source</a> and available for download and self-hosting.')
   }
   
   function mouseoverQuadrant (order) {

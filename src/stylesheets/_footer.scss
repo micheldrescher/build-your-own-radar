@@ -6,12 +6,20 @@
     width: 50%;
     margin: 0 auto;
 
-    p {
+    p:first-child {
       padding-top: 60px;
+    }
+
+    p {
       font-size: $baseFont;
       font-weight: $baseWeight;
       text-align: left;
+      margin-bottom: unset;
+      margin-top: 0.5em;
     }
 
+    p:last-child {
+      padding-bottom: 60px;
+    }
   }
 }
