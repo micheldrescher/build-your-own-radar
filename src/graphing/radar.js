@@ -412,15 +412,9 @@ const Radar = function (size, radar) {
     }
   }
 
-  function removeRadarLegend () {
-    d3.select('.legend').remove()
-  }
-
   function drawLegend (order) {
-    // do nothing for now - perhaps add a scale at a later point i ntime?
+    // do nothing for now - perhaps add a scale at a later point in ntime?
     if (true) return
-
-    removeRadarLegend()
 
     var triangleKey = 'New or moved'
     var circleKey = 'No change'
@@ -477,7 +471,6 @@ const Radar = function (size, radar) {
 
   function redrawFullRadar () {
     removeHomeLink()
-    removeRadarLegend()
     tip.hide()
     d3.selectAll('g.blip-link').attr('opacity', 1.0)
 
@@ -605,22 +598,47 @@ const Radar = function (size, radar) {
   }
 
   function plotRadarFooter () {
-    var fc = d3.select('body')
+    var footer = d3.select('body')
       .insert('div', '#radar-plot + *')
       .attr('id', 'footer')
+
+    plotRadarFooterContent(footer)
+    plotRadarFooterLegend(footer)
+  }
+
+  function plotRadarFooterContent(footerHandle) {
+    var fc = footerHandle
       .append('div')
       .attr('class', 'footer-content')
 
     fc.append('p').html('Powered by <a href="https://www.cyberwatching.eu/">Cyberwatching.eu</a>. ')
     fc.append('p').html('The Cybersecurity and Privacy Project Radar provides a birdseye view of the ' +
-                        'complete collection of EU funded projects in the cybersecurity space.' +
-                        'Projects with a colour gradient have volunteered in a technology and market readiness assessment by Cyberwatching.eu.')
-    fc.append('p').html('Mouseover the sectors or the buttons to explore sectors.' +
-                        'Click on a sector or button to drill down into individual sectors.')
+                        'complete collection of EU funded projects in the cybersecurity space. ' +
+                        'Projects with a colour gradient have volunteered in a technology and market readiness assessment by Cyberwatching.eu. ')
+    fc.append('p').html('Mouseover the sectors or the buttons to explore sectors. ' +
+                        'Click on a sector or button to drill down into individual sectors. ')
     fc.append('p').html('When in sector view, mouseover individual project dots to learn their short name.' +
                         'Click on a project name in the list view to see its vital statistics. ' +
-                        'Then engage with it more closely via the <a href="https://www.cyberwatching.eu/projects">Cyberwatching.eu project hub</a>.')
-    fc.append('p').html('This software is <a href="https://github.com/micheldrescher/cyberwatching_radar">open source</a> and available for download and self-hosting.')
+                        'Then engage with it more closely via the <a href="https://www.cyberwatching.eu/projects">Cyberwatching.eu project hub</a>. ')
+    fc.append('p').html('This software is <a href="https://github.com/micheldrescher/cyberwatching_radar">open source</a> and available for download and self-hosting. ')
+  }
+
+  function plotRadarFooterLegend(footerHandle) {
+    var fl = footerHandle
+      .append('div')
+      .attr('class', 'footer-legend')
+
+    fl.append('p').html('<b>Legend:</b> ')
+    fl.append('p').html('The colours in the radar need to be read and assessed on a <em>per ring per '+
+                        'segment</em> basis as only those are comparable to each other.')
+    fl.append('p').html('The colour gradient of the blips indicates <em>market and technology readiness progress</em> '+
+                        'relative to the mean in the same ring in the same segment as follows:')
+    fl.append('p').html('<span id="legend-red">Red</span> indicates SLOWEST relative progress.')
+    fl.append('p').html('<span id="legend-orange">Orange</span> indicates SLOW relative progress.')
+    fl.append('p').html('<span id="legend-yellow">Yellow</span> indicates MEDIAN relative progress.')
+    fl.append('p').html('<span id="legend-green">Light-green</span> indicates FAST relative progress.')
+    fl.append('p').html('<span id="legend-lime">Lime</span> indicates FASTEST relative progress.')
+    fl.append('p').html('<span id="legend-white">White</span> means no information available.')
   }
   
   function mouseoverQuadrant (order) {
